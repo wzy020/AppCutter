@@ -104,24 +104,19 @@ public class MainActivity extends Activity {
     private void parseApk(File apkFile) {
         try {
             Class<?> clazz = Class.forName("android.content.pm.PackageParser");
-            //Object packageParser = MethodUtils.invokeConstructor(clazz, apkFile.getAbsolutePath());
-            //Constructor c=clazz.getConstructor(String.class);
-            //c.setAccessible(true);
             Object packageParser = clazz.newInstance();
 
-            //Object packageObj = MethodUtils.invokeMethod(packageParser, "parsePackage", apkFile, apkFile.getAbsolutePath(), 0);
             Method parsePackage=clazz.getDeclaredMethod("parsePackage", File.class, int.class);
             parsePackage.setAccessible(true);
             Object packageObj = parsePackage.invoke(packageParser, apkFile, 0);
 
-            //List activies = (List) FieldUtils.readField(packageObj, "activities");
             Field activities = packageObj.getClass().getDeclaredField("activities");
             activities.setAccessible(true);
             List activies = (List) activities.get(packageObj);
 
             for (Object data : activies) {
-                //List<IntentFilter> filters = (List) FieldUtils.readField(data, "intents");
-                Field intents = data.getClass().getDeclaredField("intents");
+                Class<?> inte = data.getClass().getSuperclass();
+                Field intents = inte.getDeclaredField("intents");
                 intents.setAccessible(true);
                 List<IntentFilter> filters = (List) intents.get(data);
 
